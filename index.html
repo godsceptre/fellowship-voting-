@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fellowship Election 2026</title>
+<meta name="author" content="Ayoade Kehinde Yomi">
+<!-- "Fellowship Election 2026" by Ayoade Kehinde Yomi. Copyright (c) 2026 Ayoade Kehinde Yomi. Made in the Tanimawo AI Academy Code Lab on Nov 14, 2026, 6:39 PM (2026-11-14T17:39:05.530Z). -->
+<style>
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fellowship Election Portal | Bayero University Kano</title>
+    
+    <!-- Load Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* --- Global Variables & Reset --- */
+        :root {
+            --primary-color: #003366;
+            --secondary-bg: #f4f4f9;
+            --accent-success: #28a745;
+            --text-main: #333;
+            --border-radius: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--secondary-bg); color: var(--text-main); display: flex; justify-content: center; padding: 2rem 1rem; line-height: 1.6; }
+        .app-container { background: white; padding: 2rem; border-radius: var(--border-radius); box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 600px; }
+        header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid var(--secondary-bg); padding-bottom: 1rem; }
+        header h1 { color: var(--primary-color); font-size: 1.6rem; margin-bottom: 0.5rem; }
+        #system-status { color: #666; font-weight: 600; font-size: 0.9rem; }
+
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; }
+        .input-group input { width: 100%; padding: 0.85rem; border: 1px solid #ccc; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s; }
+        .input-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1); }
+
+        button { width: 100%; padding: 1rem; background-color: var(--primary-color); color: white; border: none; border-radius: var(--border-radius); font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s; margin-top: 1rem; }
+        button:hover { background-color: #001f3f; }
+        button:disabled { background-color: #999; cursor: not-allowed; }
+        
+        .danger-btn { background-color: #dc3545; }
+        .danger-btn:hover { background-color: #c82333; }
+        .secondary-btn { background-color: #6c757d; margin-top: 0.5rem; }
+        .secondary-btn:hover { background-color: #5a6268; }
+
+        .office-category { border: 1px solid #e0e0e0; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); background-color: #fafafa; }
+        .office-category legend { font-weight: bold; padding: 0 0.75rem; color: var(--primary-color); font-size: 1.1rem; background: white; border: 1px solid #e0e0e0; border-radius: 4px; }
+        
+        .candidate-card { display: flex; align-items: center; border: 2px solid #ddd; padding: 1rem; margin-bottom: 0.75rem; border-radius: var(--border-radius); cursor: pointer; background-color: white; transition: all 0.2s ease; }
+        .candidate-card:hover { border-color: var(--primary-color); }
+        .candidate-card input[type="radio"] { margin-right: 1rem; transform: scale(1.3); cursor: pointer; }
+        
+        /* Ready for candidate images if you add <img> tags later */
+        .candidate-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eee; background-color: #f8f9fa; }
+        
+        .candidate-name { font-size: 1.05rem; font-weight: 500; }
+        .candidate-card:has(input[type="radio"]:checked) { border-color: var(--accent-success); background-color: #e8f5e9; }
+
+        #selection-summary { background: #f8f9fa; padding: 1rem; border-radius: var(--border-radius); margin: 1.5rem 0; font-size: 1rem; border: 1px solid #ddd; }
+        #selection-summary p { margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eee; }
+        #selection-summary p:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    </style>
+</head>
+<body>
+
+    <main class="app-container">
+        <header>
+            <h1>Fellowship Election 2026</h1>
+            <p id="system-status">Secure Voting Portal</p>
+        </header>
+
+        <!-- PHASE 1: AUTHENTICATION & WHITELIST CHECK -->
+        <section id="auth-section">
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="reg-number">Institutional Registration Number</label>
+                    <input type="text" id="reg-number" required placeholder="e.g., AHS/27/NUR/00456">
+                </div>
+                
+                <div class="input-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" required placeholder="e.g., Nursing Science">
+                </div>
+
+                <div class="input-group">
+                    <label for="email-address">University Email Address</label>
+                    <input type="email" id="email-address" required placeholder="student@buk.edu.ng">
+                    <button type="button" id="send-code-btn" class="secondary-btn" style="padding: 0.75rem; font-size: 1rem;">Send Verification Code</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="email-code">Secure Email Verification Code</label>
+                    <input type="number" id="email-code" required placeholder="6-digit code" autocomplete="off">
+                </div>
+
+                <button type="submit" id="verify-btn">Verify & Enter Ballot</button>
+            </form>
+        </section>
+
+        <!-- PHASE 2: SECRET BALLOT -->
+        <section id="ballot-section" style="display: none;">
+            <form id="voting-form">
+                <fieldset class="office-category">
+                    <legend>President</legend>
+                    <label class="candidate-card"><input type="radio" name="president" value="Ayoade Kehinde Yomi" required><span class="candidate-name">Ayoade Kehinde Yomi</span></label>
+                    <label class="candidate-card"><input type="radio" name="president" value="Adewumi Ibrahim Ayomi"><span class="candidate-name">Adewumi Ibrahim Ayomi</span></label>
+                    <label class="candidate-card"><input type="radio" name="president" value="Ayo Mafo"><span class="candidate-name">Ayo Mafo</span></label>
+                </fieldset>
+
+                <fieldset class="office-category">
+                    <legend>Vice-President</legend>
+                    <label class="candidate-card"><input type="radio" name="vice_president" value="Seyi Adu" required><span class="candidate-name">Seyi Adu</span></label>
+                    <label class="candidate-card"><input type="radio" name="vice_president" value="Bayo Oke"><span class="candidate-name">Bayo Oke</span></label>
+                </fieldset>
+
+                <fieldset class="office-category">
+                    <legend>Secretary</legend>
+                    <label class="candidate-card"><input type="radio" name="secretary" value="Semi Layi" required><span class="candidate-name">Semi Layi</span></label>
+                    <label class="candidate-card"><input type="radio" name="secretary" value="Lami Gbola"><span class="candidate-name">Lami Gbola</span></label>
+                </fieldset>
+
+                <button type="submit" id="review-vote-btn">Review & Cast Vote</button>
+            </form>
+        </section>
+
+        <!-- PHASE 3: FINAL CONFIRMATION -->
+        <section id="confirmation-modal" style="display: none;">
+            <div id="selection-summary"></div>
+            <button id="final-submit-btn" class="danger-btn">Cast Final Vote</button>
+            <button id="edit-vote-btn" class="secondary-btn">Go Back & Edit</button>
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // 1. YOUR SUPABASE KEYS (PASTE THEM HERE)
+        // ==========================================
+        const supabaseUrl = 'https://zuwzsellnmlqzvfxghhv.supabase.co';
+        const supabaseKey = 'sb_publishable_H6nqgHgKRoWA7F0KBllZqA_S6x-a-OB';
+
+        // ==========================================
+        // 2. SYSTEM INITIALIZATION
+        // ==========================================
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const authForm = document.getElementById('auth-form');
+            const votingForm = document.getElementById('voting-form');
+            const sendCodeBtn = document.getElementById('send-code-btn');
+            
+            const authSection = document.getElementById('auth-section');
+            const ballotSection = document.getElementById('ballot-section');
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const selectionSummary = document.getElementById('selection-summary');
+            const systemStatus = document.getElementById('system-status');
+
+            let sessionData = {};
+            let generatedOTP = null; 
+
+            // ==========================================
+            // 3. SEND VERIFICATION CODE LOGIC (WITH WHITELIST CHECK)
+            // ==========================================
+            sendCodeBtn.addEventListener('click', async () => {
+                const regInput = document.getElementById('reg-number').value.trim().toUpperCase();
+                const emailInput = document.getElementById('email-address').value.trim();
+                
+                if (!regInput || !emailInput) {
+                    alert("Please enter both your Registration Number and University Email Address first.");
+                    return;
+                }
+
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.textContent = 'Checking Eligibility...';
+
+                // STEP A: Check if the Registration Number is on the eligible_voters whitelist
+                const { data: voterData, error: voterError } = await supabase
+                    .from('eligible_voters')
+                    .select('registration_number')
+                    .eq('registration_number', regInput)
+                    .maybeSingle();
+
+                if (voterError || !voterData) {
+                    alert(`ACCESS DENIED: Registration number ${regInput} is not on the eligible voters list.`);
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = 'Send Verification Code';
+                    return;
+                }
+
+                // STEP B: Check if they have already voted
+                const { data: existingVote } = await supabase
+                    .from('votes')
+                    .select('registration_number')
+                    .eq('registration_number', regInput)
+                    .maybeSingle();
+
+                if (existingVote) {
+                    alert(`ALREADY VOTED: Registration number ${regInput} has already cast a ballot.`);
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = 'Send Verification Code';
+                    return;
+                }
+
+                // STEP C: Generate and send the OTP if they pass both checks
+                generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+                sendCodeBtn.textContent = 'Sending Code...';
+
+                const { error: emailError } = await supabase.rpc('send_verification_email', {
+                    student_email: emailInput,
+                    otp_code: generatedOTP
+                });
+
+                if (emailError) {
+                    alert("Failed to send code. Please check your internet connection.");
+                    console.error("Supabase RPC Error:", emailError);
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = 'Send Verification Code';
+                } else {
+                    alert("Eligibility confirmed! Verification code sent to your inbox.");
+                    sendCodeBtn.textContent = 'Code Sent';
+                    setTimeout(() => {
+                        sendCodeBtn.disabled = false;
+                        sendCodeBtn.textContent = 'Resend Code';
+                    }, 30000);
+                }
+            });
+
+            // ==========================================
+            // 4. AUTHENTICATION & BALLOT LOGIC
+            // ==========================================
+            authForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const userEnteredCode = document.getElementById('email-code').value.trim();
+                
+                if (!generatedOTP) {
+                    alert('Please click "Send Verification Code" to receive your code first.');
+                    return;
+                }
+
+                if (userEnteredCode !== generatedOTP) {
+                    alert('Security Error: The verification code is incorrect. Please try again.');
+                    return;
+                }
+
+                sessionData.regNumber = document.getElementById('reg-number').value.trim().toUpperCase();
+                sessionData.department = document.getElementById('department').value.trim();
+                sessionData.emailAddress = document.getElementById('email-address').value.trim();
+
+                authSection.style.display = 'none';
+                ballotSection.style.display = 'block';
+                systemStatus.textContent = `Verified: ${sessionData.regNumber} | ${sessionData.department}`;
+                systemStatus.style.color = 'var(--accent-success)';
+                window.scrollTo(0, 0);
+            });
+
+            votingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(votingForm);
+                sessionData.president = formData.get('president');
+                sessionData.vicePresident = formData.get('vice_president');
+                sessionData.secretary = formData.get('secretary');
+
+                selectionSummary.innerHTML = `
+                    <p><strong>President:</strong> ${sessionData.president}</p>
+                    <p><strong>Vice-President:</strong> ${sessionData.vicePresident}</p>
+                    <p><strong>Secretary:</strong> ${sessionData.secretary}</p>
+                `;
+
+                ballotSection.style.display = 'none';
+                confirmationModal.style.display = 'block';
+                window.scrollTo(0, 0);
+            });
+
+            document.getElementById('edit-vote-btn').addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+                ballotSection.style.display = 'block';
+            });
+
+            // ==========================================
+            // 5. TRANSMIT VOTE TO SUPABASE DATABASE
+            // ==========================================
+            document.getElementById('final-submit-btn').addEventListener('click', async (e) => {
+                const btn = e.target;
+                btn.disabled = true;
+                btn.textContent = 'Encrypting & Submitting...';
+
+                const { error } = await supabase
+                    .from('votes')
+                    .insert([{ 
+                        registration_number: sessionData.regNumber, 
+                        department: sessionData.department,
+                        president_vote: sessionData.president,
+                        vice_president_vote: sessionData.vicePresident,
+                        secretary_vote: sessionData.secretary
+                    }]);
+
+                if (error) {
+                    if (error.code === '23505') {
+                        alert(`VOTE REJECTED: Registration number ${sessionData.regNumber} has already cast a ballot in this election.`);
+                    } else {
+                        alert(`SYSTEM ERROR: ${error.message}`);
+                    }
+                    btn.disabled = false;
+                    btn.textContent = 'Cast Final Vote';
+                } else {
+                    alert('SUCCESS: Your vote has been securely recorded.');
+                    
+                    // Reset Application for next voter
+                    confirmationModal.style.display = 'none';
+                    authSection.style.display = 'block';
+                    authForm.reset();
+                    votingForm.reset();
+                    sessionData = {};
+                    generatedOTP = null;
+                    sendCodeBtn.textContent = 'Send Verification Code';
+                    sendCodeBtn.disabled = false;
+                    systemStatus.textContent = 'Secure Voting Portal';
+                    systemStatus.style.color = '#666';
+                    btn.disabled = false;
+                    btn.textContent = 'Cast Final Vote';
+                    window.scrollTo(0, 0);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+<p style="display:flex;align-items:center;justify-content:center;gap:10px;margin:28px 0 14px;text-align:center;font:13px/1.4 system-ui,sans-serif;color:#888"><a href="https://tanimawoai.com/" style="display:inline-flex" title="Tanimawo AI Academy"><img src="https://tanimawoai.com/assets/footer-logo-sm.webp?v=2" alt="AI Academy with Dr. Daniel Tanimawo" width="96" height="96" style="width:96px;height:96px;object-fit:contain;border-radius:12px"></a><span>Made by Ayoade Kehinde Yomi &middot; Nov 14, 2026, 6:39 PM &middot; Tanimawo AI Academy Code Lab</span></p>
+
+<script>
+
+</script>
+</body>
+</html>
