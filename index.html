@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fellowship Election 2026</title>
-<meta name="author" content="Ayoade Kehinde Yomi">
-<!-- "Fellowship Election 2026" by Ayoade Kehinde Yomi. Copyright (c) 2026 Ayoade Kehinde Yomi. Made in the Tanimawo AI Academy Code Lab on Nov 14, 2026, 6:39 PM (2026-11-14T17:39:05.530Z). -->
-<style>
-
-</style>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fellowship Election Portal | Bayero University Kano</title>
@@ -59,7 +46,6 @@
         .candidate-card:hover { border-color: var(--primary-color); }
         .candidate-card input[type="radio"] { margin-right: 1rem; transform: scale(1.3); cursor: pointer; }
         
-        /* Ready for candidate images if you add <img> tags later */
         .candidate-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eee; background-color: #f8f9fa; }
         
         .candidate-name { font-size: 1.05rem; font-weight: 500; }
@@ -111,21 +97,42 @@
             <form id="voting-form">
                 <fieldset class="office-category">
                     <legend>President</legend>
-                    <label class="candidate-card"><input type="radio" name="president" value="Ayoade Kehinde Yomi" required><span class="candidate-name">Ayoade Kehinde Yomi</span></label>
-                    <label class="candidate-card"><input type="radio" name="president" value="Adewumi Ibrahim Ayomi"><span class="candidate-name">Adewumi Ibrahim Ayomi</span></label>
-                    <label class="candidate-card"><input type="radio" name="president" value="Ayo Mafo"><span class="candidate-name">Ayo Mafo</span></label>
+                    <label class="candidate-card">
+                        <input type="radio" name="president" value="Ayoade Kehinde Yomi" required>
+                        <span class="candidate-name">Ayoade Kehinde Yomi</span>
+                    </label>
+                    <label class="candidate-card">
+                        <input type="radio" name="president" value="Adewumi Ibrahim Ayomi">
+                        <span class="candidate-name">Adewumi Ibrahim Ayomi</span>
+                    </label>
+                    <label class="candidate-card">
+                        <input type="radio" name="president" value="Ayo Mafo">
+                        <span class="candidate-name">Ayo Mafo</span>
+                    </label>
                 </fieldset>
 
                 <fieldset class="office-category">
                     <legend>Vice-President</legend>
-                    <label class="candidate-card"><input type="radio" name="vice_president" value="Seyi Adu" required><span class="candidate-name">Seyi Adu</span></label>
-                    <label class="candidate-card"><input type="radio" name="vice_president" value="Bayo Oke"><span class="candidate-name">Bayo Oke</span></label>
+                    <label class="candidate-card">
+                        <input type="radio" name="vice_president" value="Seyi Adu" required>
+                        <span class="candidate-name">Seyi Adu</span>
+                    </label>
+                    <label class="candidate-card">
+                        <input type="radio" name="vice_president" value="Bayo Oke">
+                        <span class="candidate-name">Bayo Oke</span>
+                    </label>
                 </fieldset>
 
                 <fieldset class="office-category">
                     <legend>Secretary</legend>
-                    <label class="candidate-card"><input type="radio" name="secretary" value="Semi Layi" required><span class="candidate-name">Semi Layi</span></label>
-                    <label class="candidate-card"><input type="radio" name="secretary" value="Lami Gbola"><span class="candidate-name">Lami Gbola</span></label>
+                    <label class="candidate-card">
+                        <input type="radio" name="secretary" value="Semi Layi" required>
+                        <span class="candidate-name">Semi Layi</span>
+                    </label>
+                    <label class="candidate-card">
+                        <input type="radio" name="secretary" value="Lami Gbola">
+                        <span class="candidate-name">Lami Gbola</span>
+                    </label>
                 </fieldset>
 
                 <button type="submit" id="review-vote-btn">Review & Cast Vote</button>
@@ -143,15 +150,12 @@
 
     <script>
         // ==========================================
-        // 1. YOUR SUPABASE KEYS (PASTE THEM HERE)
+        // 1. PASTE YOUR SUPABASE KEYS HERE
         // ==========================================
         const supabaseUrl = 'https://zuwzsellnmlqzvfxghhv.supabase.co';
         const supabaseKey = 'sb_publishable_H6nqgHgKRoWA7F0KBllZqA_S6x-a-OB';
 
-        // ==========================================
-        // 2. SYSTEM INITIALIZATION
-        // ==========================================
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         document.addEventListener('DOMContentLoaded', () => {
             const authForm = document.getElementById('auth-form');
@@ -167,87 +171,86 @@
             let sessionData = {};
             let generatedOTP = null; 
 
-            // ==========================================
-            // 3. SEND VERIFICATION CODE LOGIC (WITH WHITELIST CHECK)
-            // ==========================================
             sendCodeBtn.addEventListener('click', async () => {
                 const regInput = document.getElementById('reg-number').value.trim().toUpperCase();
                 const emailInput = document.getElementById('email-address').value.trim();
                 
                 if (!regInput || !emailInput) {
-                    alert("Please enter both your Registration Number and University Email Address first.");
+                    alert("Please enter both your Registration Number and Email Address first.");
                     return;
                 }
 
                 sendCodeBtn.disabled = true;
                 sendCodeBtn.textContent = 'Checking Eligibility...';
 
-                // STEP A: Check if the Registration Number is on the eligible_voters whitelist
-                const { data: voterData, error: voterError } = await supabase
-                    .from('eligible_voters')
-                    .select('registration_number')
-                    .eq('registration_number', regInput)
-                    .maybeSingle();
+                try {
+                    // STEP A: Whitelist check
+                    const { data: voterData, error: voterError } = await supabaseClient
+                        .from('eligible_voters')
+                        .select('registration_number')
+                        .eq('registration_number', regInput)
+                        .maybeSingle();
 
-                if (voterError || !voterData) {
-                    alert(`ACCESS DENIED: Registration number ${regInput} is not on the eligible voters list.`);
-                    sendCodeBtn.disabled = false;
-                    sendCodeBtn.textContent = 'Send Verification Code';
-                    return;
-                }
-
-                // STEP B: Check if they have already voted
-                const { data: existingVote } = await supabase
-                    .from('votes')
-                    .select('registration_number')
-                    .eq('registration_number', regInput)
-                    .maybeSingle();
-
-                if (existingVote) {
-                    alert(`ALREADY VOTED: Registration number ${regInput} has already cast a ballot.`);
-                    sendCodeBtn.disabled = false;
-                    sendCodeBtn.textContent = 'Send Verification Code';
-                    return;
-                }
-
-                // STEP C: Generate and send the OTP if they pass both checks
-                generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-                sendCodeBtn.textContent = 'Sending Code...';
-
-                const { error: emailError } = await supabase.rpc('send_verification_email', {
-                    student_email: emailInput,
-                    otp_code: generatedOTP
-                });
-
-                if (emailError) {
-                    alert("Failed to send code. Please check your internet connection.");
-                    console.error("Supabase RPC Error:", emailError);
-                    sendCodeBtn.disabled = false;
-                    sendCodeBtn.textContent = 'Send Verification Code';
-                } else {
-                    alert("Eligibility confirmed! Verification code sent to your inbox.");
-                    sendCodeBtn.textContent = 'Code Sent';
-                    setTimeout(() => {
+                    if (voterError || !voterData) {
+                        alert("ACCESS DENIED: Registration number not found in the eligible voters list.");
                         sendCodeBtn.disabled = false;
-                        sendCodeBtn.textContent = 'Resend Code';
-                    }, 30000);
+                        sendCodeBtn.textContent = 'Send Verification Code';
+                        return;
+                    }
+
+                    // STEP B: Duplicate vote check
+                    const { data: existingVote } = await supabaseClient
+                        .from('votes')
+                        .select('registration_number')
+                        .eq('registration_number', regInput)
+                        .maybeSingle();
+
+                    if (existingVote) {
+                        alert("NOTICE: This registration number has already cast a vote.");
+                        sendCodeBtn.disabled = false;
+                        sendCodeBtn.textContent = 'Send Verification Code';
+                        return;
+                    }
+
+                    // STEP C: Send OTP via Supabase RPC
+                    generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+                    sendCodeBtn.textContent = 'Sending Code...';
+
+                    const { error: emailError } = await supabaseClient.rpc('send_verification_email', {
+                        student_email: emailInput,
+                        otp_code: generatedOTP
+                    });
+
+                    if (emailError) {
+                        alert("Error sending email: " + emailError.message);
+                        sendCodeBtn.disabled = false;
+                        sendCodeBtn.textContent = 'Send Verification Code';
+                    } else {
+                        alert("Eligibility confirmed! Verification code sent to your inbox.");
+                        sendCodeBtn.textContent = 'Code Sent';
+                        setTimeout(() => {
+                            sendCodeBtn.disabled = false;
+                            sendCodeBtn.textContent = 'Resend Code';
+                        }, 30000);
+                    }
+                } catch (err) {
+                    alert("Unexpected error: " + err.message);
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = 'Send Verification Code';
                 }
             });
 
-            // ==========================================
-            // 4. AUTHENTICATION & BALLOT LOGIC
-            // ==========================================
             authForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const userEnteredCode = document.getElementById('email-code').value.trim();
                 
                 if (!generatedOTP) {
-                    alert('Please click "Send Verification Code" to receive your code first.');
+                    alert('Please click "Send Verification Code" first.');
                     return;
                 }
 
                 if (userEnteredCode !== generatedOTP) {
-                    alert('Security Error: The verification code is incorrect. Please try again.');
+                    alert('ERROR: The 6-digit verification code is incorrect.');
                     return;
                 }
 
@@ -285,15 +288,12 @@
                 ballotSection.style.display = 'block';
             });
 
-            // ==========================================
-            // 5. TRANSMIT VOTE TO SUPABASE DATABASE
-            // ==========================================
             document.getElementById('final-submit-btn').addEventListener('click', async (e) => {
                 const btn = e.target;
                 btn.disabled = true;
                 btn.textContent = 'Encrypting & Submitting...';
 
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('votes')
                     .insert([{ 
                         registration_number: sessionData.regNumber, 
@@ -304,17 +304,11 @@
                     }]);
 
                 if (error) {
-                    if (error.code === '23505') {
-                        alert(`VOTE REJECTED: Registration number ${sessionData.regNumber} has already cast a ballot in this election.`);
-                    } else {
-                        alert(`SYSTEM ERROR: ${error.message}`);
-                    }
+                    alert(error.code === '23505' ? 'This registration number has already voted.' : 'Error: ' + error.message);
                     btn.disabled = false;
                     btn.textContent = 'Cast Final Vote';
                 } else {
                     alert('SUCCESS: Your vote has been securely recorded.');
-                    
-                    // Reset Application for next voter
                     confirmationModal.style.display = 'none';
                     authSection.style.display = 'block';
                     authForm.reset();
@@ -332,13 +326,5 @@
             });
         });
     </script>
-</body>
-</html>
-
-<p style="display:flex;align-items:center;justify-content:center;gap:10px;margin:28px 0 14px;text-align:center;font:13px/1.4 system-ui,sans-serif;color:#888"><a href="https://tanimawoai.com/" style="display:inline-flex" title="Tanimawo AI Academy"><img src="https://tanimawoai.com/assets/footer-logo-sm.webp?v=2" alt="AI Academy with Dr. Daniel Tanimawo" width="96" height="96" style="width:96px;height:96px;object-fit:contain;border-radius:12px"></a><span>Made by Ayoade Kehinde Yomi &middot; Nov 14, 2026, 6:39 PM &middot; Tanimawo AI Academy Code Lab</span></p>
-
-<script>
-
-</script>
 </body>
 </html>
