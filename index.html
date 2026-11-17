@@ -5,61 +5,486 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fellowship Election Portal | Bayero University Kano</title>
     
-    <!-- Load Supabase -->
+    <!-- Load Supabase & Modern Typography -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* --- Global Variables & Reset --- */
+        /* --- 3D Design System & Variables --- */
         :root {
-            --primary-color: #003366;
-            --secondary-bg: #f4f4f9;
-            --accent-success: #28a745;
-            --text-main: #333;
-            --border-radius: 8px;
+            --navy-deep: #040d21;
+            --navy-primary: #0a2558;
+            --navy-accent: #1d4ed8;
+            --gold-accent: #f59e0b;
+            --emerald-success: #10b981;
+            --emerald-dark: #059669;
+            --danger-red: #ef4444;
+            --danger-dark: #b91c1c;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --radius-lg: 20px;
+            --radius-md: 14px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--secondary-bg); color: var(--text-main); display: flex; justify-content: center; padding: 2rem 1rem; line-height: 1.6; }
-        .app-container { background: white; padding: 2rem; border-radius: var(--border-radius); box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 600px; }
-        header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid var(--secondary-bg); padding-bottom: 1rem; }
-        header h1 { color: var(--primary-color); font-size: 1.6rem; margin-bottom: 0.5rem; }
-        #system-status { color: #666; font-weight: 600; font-size: 0.9rem; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+        }
 
-        .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; }
-        .input-group input { width: 100%; padding: 0.85rem; border: 1px solid #ccc; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s; }
-        .input-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1); }
+        /* --- 3D Ambient Stage Background --- */
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 15% 15%, #13387c 0%, #071636 45%, #030917 100%);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2.25rem 1rem 4rem;
+            line-height: 1.6;
+            perspective: 1200px;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-        button { width: 100%; padding: 1rem; background-color: var(--primary-color); color: white; border: none; border-radius: var(--border-radius); font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s; margin-top: 1rem; }
-        button:hover { background-color: #001f3f; }
-        button:disabled { background-color: #999; cursor: not-allowed; }
-        
-        .danger-btn { background-color: #dc3545; }
-        .danger-btn:hover { background-color: #c82333; }
-        .secondary-btn { background-color: #6c757d; margin-top: 0.5rem; }
-        .secondary-btn:hover { background-color: #5a6268; }
+        /* Floating 3D Ambient Orbs */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(70px);
+            z-index: 0;
+            pointer-events: none;
+            animation: floatOrb 10s ease-in-out infinite alternate;
+        }
 
-        .office-category { border: 1px solid #e0e0e0; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); background-color: #fafafa; }
-        .office-category legend { font-weight: bold; padding: 0 0.75rem; color: var(--primary-color); font-size: 1.1rem; background: white; border: 1px solid #e0e0e0; border-radius: 4px; }
-        
-        .candidate-card { display: flex; align-items: center; border: 2px solid #ddd; padding: 1rem; margin-bottom: 0.75rem; border-radius: var(--border-radius); cursor: pointer; background-color: white; transition: all 0.2s ease; }
-        .candidate-card:hover { border-color: var(--primary-color); }
-        .candidate-card input[type="radio"] { margin-right: 1rem; transform: scale(1.3); cursor: pointer; }
-        
-        .candidate-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eee; background-color: #f8f9fa; flex-shrink: 0; }
-        
-        .candidate-name { font-size: 1.05rem; font-weight: 500; }
-        .candidate-card:has(input[type="radio"]:checked) { border-color: var(--accent-success); background-color: #e8f5e9; }
+        body::before {
+            width: 320px;
+            height: 320px;
+            background: rgba(29, 78, 216, 0.38);
+            top: -80px;
+            left: -80px;
+        }
 
-        #selection-summary { background: #f8f9fa; padding: 1rem; border-radius: var(--border-radius); margin: 1.5rem 0; font-size: 1rem; border: 1px solid #ddd; }
-        #selection-summary p { margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eee; }
-        #selection-summary p:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        body::after {
+            width: 280px;
+            height: 280px;
+            background: rgba(245, 158, 11, 0.22);
+            bottom: -60px;
+            right: -60px;
+            animation-delay: -5s;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(25px, 30px, 40px) scale(1.08); }
+        }
+
+        /* --- Main Floating 3D Glass Card --- */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 580px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            padding: 2.25rem 1.75rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow:
+                0 30px 60px -12px rgba(2, 8, 23, 0.65),
+                0 18px 36px -18px rgba(10, 37, 88, 0.5),
+                inset 0 2px 1px rgba(255, 255, 255, 1),
+                inset 0 -3px 8px rgba(15, 23, 42, 0.06);
+            transform-style: preserve-3d;
+            animation: cardEntrance 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(24px) rotateX(4deg) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
+            }
+        }
+
+        /* --- 3D Header Banner --- */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 1.25rem;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #0a2558 0%, #174291 60%, #0f3275 100%);
+            color: white;
+            box-shadow:
+                0 14px 28px -8px rgba(10, 37, 88, 0.45),
+                inset 0 1px 1px rgba(255, 255, 255, 0.35),
+                inset 0 -3px 6px rgba(4, 13, 33, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.14) 0%,
+                rgba(255, 255, 255, 0) 45%
+            );
+            pointer-events: none;
+        }
+
+        .portal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fde68a;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 0.65rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #34d399;
+            animation: pulseDot 1.8s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0.65; }
+        }
+
+        header h1 {
+            color: #ffffff;
+            font-size: 1.65rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0.35rem;
+        }
+
+        #system-status {
+            display: inline-block;
+            background: rgba(4, 13, 33, 0.45);
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        /* --- Recessed 3D Form Inputs --- */
+        .input-group {
+            margin-bottom: 1.35rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.45rem;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #1e293b;
+            letter-spacing: 0.01em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            box-shadow:
+                inset 0 2px 5px rgba(15, 23, 42, 0.07),
+                0 1px 0 rgba(255, 255, 255, 0.9);
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--navy-accent);
+            transform: translateY(-2px);
+            box-shadow:
+                0 10px 20px -6px rgba(29, 78, 216, 0.22),
+                0 0 0 4px rgba(29, 78, 216, 0.12);
+        }
+
+        /* --- Tactile 3D Push Buttons --- */
+        button {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(180deg, #1d4ed8 0%, #0a2558 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            margin-top: 0.75rem;
+            box-shadow:
+                0 6px 0 #051536,
+                0 12px 24px -6px rgba(10, 37, 88, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            filter: brightness(1.07);
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 0 #051536,
+                0 16px 28px -6px rgba(10, 37, 88, 0.58),
+                inset 0 1px 1px rgba(255, 255, 255, 0.45);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow:
+                0 2px 0 #051536,
+                0 5px 10px -3px rgba(10, 37, 88, 0.4);
+        }
+
+        button:disabled {
+            background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+            box-shadow: 0 4px 0 #475569;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
+        .secondary-btn {
+            background: linear-gradient(180deg, #475569 0%, #1e293b 100%);
+            box-shadow:
+                0 5px 0 #0f172a,
+                0 10px 18px -6px rgba(15, 23, 42, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 0.25);
+            margin-top: 0.65rem;
+        }
+
+        .secondary-btn:hover:not(:disabled) {
+            box-shadow:
+                0 7px 0 #0f172a,
+                0 14px 22px -6px rgba(15, 23, 42, 0.45),
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .secondary-btn:active:not(:disabled) {
+            box-shadow: 0 2px 0 #0f172a;
+        }
+
+        .danger-btn {
+            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+            box-shadow:
+                0 6px 0 #065f46,
+                0 12px 24px -6px rgba(5, 150, 105, 0.45),
+                inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        .danger-btn:hover:not(:disabled) {
+            box-shadow:
+                0 8px 0 #065f46,
+                0 16px 28px -6px rgba(5, 150, 105, 0.55),
+                inset 0 1px 1px rgba(255, 255, 255, 0.45);
+        }
+
+        .danger-btn:active:not(:disabled) {
+            box-shadow: 0 2px 0 #065f46;
+        }
+
+        /* --- 3D Ballot Categories & Enlarged Candidate Cards --- */
+        .office-category {
+            border: 1px solid #e2e8f0;
+            padding: 1.35rem 1.1rem 1rem;
+            margin-bottom: 1.65rem;
+            border-radius: var(--radius-md);
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            box-shadow:
+                inset 0 2px 4px rgba(255, 255, 255, 0.9),
+                0 6px 16px -6px rgba(15, 23, 42, 0.08);
+        }
+
+        .office-category legend {
+            font-weight: 800;
+            padding: 0.35rem 1rem;
+            color: #ffffff;
+            font-size: 0.92rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #0a2558 0%, #1d4ed8 100%);
+            border-radius: 999px;
+            box-shadow: 0 4px 12px rgba(10, 37, 88, 0.28);
+        }
+
+        .candidate-card {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e2e8f0;
+            padding: 0.95rem 1rem;
+            margin-bottom: 0.95rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow:
+                0 5px 0 #cbd5e1,
+                0 10px 18px -6px rgba(15, 23, 42, 0.12);
+            transform-style: preserve-3d;
+            transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+
+        .candidate-card:last-child {
+            margin-bottom: 0.25rem;
+        }
+
+        .candidate-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-3px) scale(1.01);
+            box-shadow:
+                0 8px 0 #93c5fd,
+                0 16px 26px -6px rgba(29, 78, 216, 0.2);
+        }
+
+        .candidate-card input[type="radio"] {
+            margin-right: 0.9rem;
+            width: 22px;
+            height: 22px;
+            accent-color: var(--emerald-dark);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Enlarged 115x115 Campaign Portrait */
+        .candidate-img {
+            width: 115px;
+            height: 115px;
+            border-radius: 16px;
+            object-fit: cover;
+            object-position: top center;
+            margin-right: 1rem;
+            border: 3px solid #ffffff;
+            box-shadow:
+                0 0 0 2px #cbd5e1,
+                0 10px 20px rgba(15, 23, 42, 0.22);
+            background: linear-gradient(135deg, #0a2558, #1d4ed8);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-shrink: 0;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .candidate-name {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.35;
+        }
+
+        /* Selected 3D Card State */
+        .candidate-card:has(input[type="radio"]:checked) {
+            border-color: var(--emerald-success);
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            transform: translateY(-3px) scale(1.015);
+            box-shadow:
+                0 7px 0 #10b981,
+                0 16px 28px -6px rgba(16, 185, 129, 0.32);
+        }
+
+        .candidate-card:has(input[type="radio"]:checked) .candidate-img {
+            box-shadow:
+                0 0 0 3px #10b981,
+                0 12px 24px rgba(16, 185, 129, 0.35);
+            transform: scale(1.04);
+        }
+
+        /* --- 3D Confirmation Summary Card --- */
+        #selection-summary {
+            background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+            padding: 1.35rem;
+            border-radius: var(--radius-md);
+            margin: 1rem 0 1.5rem;
+            font-size: 1rem;
+            border: 1.5px solid #bfdbfe;
+            box-shadow:
+                0 8px 20px -6px rgba(10, 37, 88, 0.14),
+                inset 0 1px 1px #ffffff;
+        }
+
+        #selection-summary h3 {
+            color: var(--navy-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.85rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dbeafe;
+        }
+
+        #selection-summary p {
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        #selection-summary p:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .portal-footer {
+            text-align: center;
+            margin-top: 1.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
 
     <main class="app-container">
         <header>
+            <div class="portal-badge">
+                <span class="live-dot"></span>
+                BUK Official E-Ballot
+            </div>
             <h1>Fellowship Election 2026</h1>
             <p id="system-status">Secure Voting Portal</p>
         </header>
@@ -80,12 +505,12 @@
                 <div class="input-group">
                     <label for="email-address">University Email Address</label>
                     <input type="email" id="email-address" required placeholder="student@buk.edu.ng">
-                    <button type="button" id="send-code-btn" class="secondary-btn" style="padding: 0.75rem; font-size: 1rem;">Send Verification Code</button>
+                    <button type="button" id="send-code-btn" class="secondary-btn" style="padding: 0.8rem; font-size: 0.98rem;">Send Verification Code</button>
                 </div>
 
                 <div class="input-group">
                     <label for="email-code">Secure Email Verification Code</label>
-                    <input type="number" id="email-code" required placeholder="6-digit code" autocomplete="off">
+                    <input type="number" id="email-code" required placeholder="Enter 6-digit OTP code" autocomplete="off">
                 </div>
 
                 <button type="submit" id="verify-btn">Verify & Enter Ballot</button>
@@ -99,17 +524,17 @@
                     <legend>President</legend>
                     <label class="candidate-card">
                         <input type="radio" name="president" value="Ayoade Kehinde Yomi" required>
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG-20250225-WA0130.jpg" class="candidate-img" alt="Ayoade Kehinde Yomi">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG-20250225-WA0130.jpg" class="candidate-img" alt="AK" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Ayoade Kehinde Yomi</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="president" value="Adewumi Ibrahim Ayomi">
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_6982.jpeg" class="candidate-img" alt="Adewumi Ibrahim Ayomi">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_6982.jpeg" class="candidate-img" alt="AI" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Adewumi Ibrahim Ayomi</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="president" value="Ayo Mafo">
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_6984.jpeg" class="candidate-img" alt="Ayo Mafo">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_6984.jpeg" class="candidate-img" alt="AM" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Ayo Mafo</span>
                     </label>
                 </fieldset>
@@ -118,12 +543,12 @@
                     <legend>Vice-President</legend>
                     <label class="candidate-card">
                         <input type="radio" name="vice_president" value="Seyi Adu" required>
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7051.jpeg" class="candidate-img" alt="Seyi Adu">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7051.jpeg" class="candidate-img" alt="SA" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Seyi Adu</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="vice_president" value="Bayo Oke">
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7114.jpeg" class="candidate-img" alt="Bayo Oke">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7114.jpeg" class="candidate-img" alt="BO" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Bayo Oke</span>
                     </label>
                 </fieldset>
@@ -132,12 +557,12 @@
                     <legend>Secretary</legend>
                     <label class="candidate-card">
                         <input type="radio" name="secretary" value="Semi Layi" required>
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7114.jpeg" class="candidate-img" alt="Semi Layi">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7114.jpeg" class="candidate-img" alt="SL" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Semi Layi</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="secretary" value="Lami Gbola">
-                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/Snapchat-2066659055.jpg" class="candidate-img" alt="Lami Gbola">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/Snapchat-2066659055.jpg" class="candidate-img" alt="LG" onerror="this.removeAttribute('src')">
                         <span class="candidate-name">Lami Gbola</span>
                     </label>
                 </fieldset>
@@ -149,10 +574,13 @@
         <!-- PHASE 3: FINAL CONFIRMATION -->
         <section id="confirmation-modal" style="display: none;">
             <div id="selection-summary"></div>
-            <button id="final-submit-btn" class="danger-btn">Cast Final Vote</button>
-            <button id="edit-vote-btn" class="secondary-btn">Go Back & Edit</button>
+            <button id="final-submit-btn" class="danger-btn">Confirm & Cast Final Vote</button>
+            <button id="edit-vote-btn" class="secondary-btn">Go Back & Edit Choices</button>
         </section>
 
+        <div class="portal-footer">
+            Encrypted One-Voter-One-Ballot Verification System
+        </div>
     </main>
 
     <script>
@@ -267,8 +695,10 @@
 
                 authSection.style.display = 'none';
                 ballotSection.style.display = 'block';
-                systemStatus.textContent = `Verified: ${sessionData.regNumber} | ${sessionData.department}`;
-                systemStatus.style.color = 'var(--accent-success)';
+                systemStatus.textContent = `Verified: ${sessionData.regNumber} • ${sessionData.department}`;
+                systemStatus.style.background = 'rgba(16, 185, 129, 0.25)';
+                systemStatus.style.color = '#6ee7b7';
+                systemStatus.style.borderColor = 'rgba(52, 211, 153, 0.4)';
                 window.scrollTo(0, 0);
             });
 
@@ -280,9 +710,10 @@
                 sessionData.secretary = formData.get('secretary');
 
                 selectionSummary.innerHTML = `
-                    <p><strong>President:</strong> ${sessionData.president}</p>
-                    <p><strong>Vice-President:</strong> ${sessionData.vicePresident}</p>
-                    <p><strong>Secretary:</strong> ${sessionData.secretary}</p>
+                    <h3>Confirm Your Ballot Selections</h3>
+                    <p><strong>President</strong> <span>${sessionData.president}</span></p>
+                    <p><strong>Vice-President</strong> <span>${sessionData.vicePresident}</span></p>
+                    <p><strong>Secretary</strong> <span>${sessionData.secretary}</span></p>
                 `;
 
                 ballotSection.style.display = 'none';
@@ -313,7 +744,7 @@
                 if (error) {
                     alert(error.code === '23505' ? 'This registration number has already voted.' : 'Error: ' + error.message);
                     btn.disabled = false;
-                    btn.textContent = 'Cast Final Vote';
+                    btn.textContent = 'Confirm & Cast Final Vote';
                 } else {
                     alert('SUCCESS: Your vote has been securely recorded.');
                     confirmationModal.style.display = 'none';
@@ -325,9 +756,11 @@
                     sendCodeBtn.textContent = 'Send Verification Code';
                     sendCodeBtn.disabled = false;
                     systemStatus.textContent = 'Secure Voting Portal';
-                    systemStatus.style.color = '#666';
+                    systemStatus.style.background = 'rgba(4, 13, 33, 0.45)';
+                    systemStatus.style.color = '#e2e8f0';
+                    systemStatus.style.borderColor = 'rgba(255, 255, 255, 0.12)';
                     btn.disabled = false;
-                    btn.textContent = 'Cast Final Vote';
+                    btn.textContent = 'Confirm & Cast Final Vote';
                     window.scrollTo(0, 0);
                 }
             });
