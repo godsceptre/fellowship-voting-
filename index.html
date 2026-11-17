@@ -46,7 +46,7 @@
         .candidate-card:hover { border-color: var(--primary-color); }
         .candidate-card input[type="radio"] { margin-right: 1rem; transform: scale(1.3); cursor: pointer; }
         
-        .candidate-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eee; background-color: #f8f9fa; }
+        .candidate-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 1rem; border: 2px solid #eee; background-color: #f8f9fa; flex-shrink: 0; }
         
         .candidate-name { font-size: 1.05rem; font-weight: 500; }
         .candidate-card:has(input[type="radio"]:checked) { border-color: var(--accent-success); background-color: #e8f5e9; }
@@ -99,14 +99,17 @@
                     <legend>President</legend>
                     <label class="candidate-card">
                         <input type="radio" name="president" value="Ayoade Kehinde Yomi" required>
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG-20250225-WA0130.jpg" class="candidate-img" alt="Ayoade Kehinde Yomi">
                         <span class="candidate-name">Ayoade Kehinde Yomi</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="president" value="Adewumi Ibrahim Ayomi">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_6982.jpeg" class="candidate-img" alt="Adewumi Ibrahim Ayomi">
                         <span class="candidate-name">Adewumi Ibrahim Ayomi</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="president" value="Ayo Mafo">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_6984.jpeg" class="candidate-img" alt="Ayo Mafo">
                         <span class="candidate-name">Ayo Mafo</span>
                     </label>
                 </fieldset>
@@ -115,10 +118,12 @@
                     <legend>Vice-President</legend>
                     <label class="candidate-card">
                         <input type="radio" name="vice_president" value="Seyi Adu" required>
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7051.jpeg" class="candidate-img" alt="Seyi Adu">
                         <span class="candidate-name">Seyi Adu</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="vice_president" value="Bayo Oke">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7114.jpeg" class="candidate-img" alt="Bayo Oke">
                         <span class="candidate-name">Bayo Oke</span>
                     </label>
                 </fieldset>
@@ -127,10 +132,12 @@
                     <legend>Secretary</legend>
                     <label class="candidate-card">
                         <input type="radio" name="secretary" value="Semi Layi" required>
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/IMG_7114.jpeg" class="candidate-img" alt="Semi Layi">
                         <span class="candidate-name">Semi Layi</span>
                     </label>
                     <label class="candidate-card">
                         <input type="radio" name="secretary" value="Lami Gbola">
+                        <img src="https://zuwzsellnmlqzvfxghhv.supabase.co/storage/v1/object/public/Candidate%20photo/Snapchat-2066659055.jpg" class="candidate-img" alt="Lami Gbola">
                         <span class="candidate-name">Lami Gbola</span>
                     </label>
                 </fieldset>
